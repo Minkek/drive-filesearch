@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Polityka Prywatności – Drive FileSearch</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles/main.css?v=4"/>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <div class="brand-icon">🔍</div>
+    <span class="brand-name">Drive <em>FileSearch</em></span>
+  </a>
+  <a class="back-link" href="index.html">← Wróć do aplikacji</a>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="hero-tag">Dokument prawny</span>
+  <h1>Polityka <span>Prywatności</span></h1>
+  <p class="hero-sub">
+    Zależy nam na Twojej prywatności. Ten dokument wyjaśnia w prosty sposób
+    jakie dane przetwarza aplikacja Drive FileSearch i dlaczego.
+  </p>
+  <p class="last-updated">Ostatnia aktualizacja: maj 2025</p>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- 1. Co to jest -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-green">🔍</div>
+      <h2>Czym jest Drive FileSearch?</h2>
+    </div>
+    <p>
+      Drive FileSearch to aplikacja webowa umożliwiająca wyszukiwanie plików na Twoim
+      Google Drive według rozszerzenia (np. PDF, XLSX, JPG). Aplikacja działa w całości
+      w Twojej przeglądarce internetowej i komunikuje się bezpośrednio z serwerami Google.
+    </p>
+    <div class="highlight">
+      <p><strong>Kluczowa zasada:</strong> Twoje pliki i dane nigdy nie trafiają na żaden zewnętrzny serwer.
+      Całe przetwarzanie odbywa się lokalnie w Twojej przeglądarce.</p>
+    </div>
+  </div>
+
+  <!-- 2. Jakie dane -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-blue">📋</div>
+      <h2>Jakie dane są przetwarzane?</h2>
+    </div>
+    <p>Aplikacja pobiera z Twojego Google Drive wyłącznie metadane plików:</p>
+    <ul>
+      <li>Nazwy plików i ich rozszerzenia</li>
+      <li>Rozmiar pliku</li>
+      <li>Data ostatniej modyfikacji</li>
+      <li>Lokalizacja pliku (nazwa folderu nadrzędnego)</li>
+      <li>Link do otwarcia pliku w Google Drive</li>
+    </ul>
+    <p style="margin-top:.75rem">
+      Aplikacja <strong style="color:var(--txt)">nie pobiera, nie odczytuje ani nie przetwarza
+      treści</strong> żadnego pliku — jedynie informacje o nim.
+    </p>
+  </div>
+
+  <!-- 3. Uprawnienia Google -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-purple">🔐</div>
+      <h2>Uprawnienia Google OAuth</h2>
+    </div>
+    <p>Przy logowaniu aplikacja prosi o następujące uprawnienia:</p>
+    <div class="scope-list">
+      <div class="scope-item">
+        <span class="scope-name">openid profile email</span>
+        <span class="scope-desc">Wyświetlenie Twojego imienia i zdjęcia profilowego w aplikacji</span>
+        <span class="scope-badge badge-safe">podstawowe</span>
+      </div>
+      <div class="scope-item">
+        <span class="scope-name">drive.metadata.readonly</span>
+        <span class="scope-desc">Odczyt nazw, rozmiarów i dat plików — bez dostępu do treści</span>
+        <span class="scope-badge badge-meta">tylko metadane</span>
+      </div>
+      <div class="scope-item">
+        <span class="scope-name">spreadsheets</span>
+        <span class="scope-desc">Tworzenie arkusza z wynikami wyszukiwania na Twoim Drive (tylko przy eksporcie)</span>
+        <span class="scope-badge badge-safe">opcjonalne</span>
+      </div>
+    </div>
+    <div class="info-box">
+      <p><strong>Uwaga:</strong> Uprawnienie <code style="font-family:var(--mono);font-size:.8rem">drive.metadata.readonly</code>
+      pozwala wyłącznie na odczyt informacji o plikach. Aplikacja nie może otwierać,
+      pobierać, modyfikować ani usuwać żadnych plików z Twojego dysku.</p>
+    </div>
+  </div>
+
+  <!-- 4. Przechowywanie -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-yellow">💾</div>
+      <h2>Przechowywanie danych</h2>
+    </div>
+    <p>Aplikacja przechowuje w Twojej przeglądarce wyłącznie:</p>
+    <ul>
+      <li>Token dostępu OAuth — tylko w pamięci sesji przeglądarki, wygasa automatycznie po ~1 godzinie</li>
+      <li>Wyniki wyszukiwania — tylko w pamięci przeglądarki podczas aktywnej sesji, usuwane przy zamknięciu karty</li>
+    </ul>
+    <p style="margin-top:.75rem">
+      Żadne dane nie są wysyłane na zewnętrzne serwery, nie są zapisywane w bazach danych
+      ani udostępniane osobom trzecim.
+    </p>
+    <div class="highlight">
+      <p><strong>Po zamknięciu karty</strong> wszystkie dane znikają. Przy następnym wejściu
+      na stronę musisz zalogować się ponownie.</p>
+    </div>
+  </div>
+
+  <!-- 5. Udostępnianie -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-red">🚫</div>
+      <h2>Udostępnianie danych osobom trzecim</h2>
+    </div>
+    <p>
+      Drive FileSearch <strong style="color:var(--txt)">nie udostępnia, nie sprzedaje
+      ani nie przekazuje</strong> żadnych danych osobom trzecim.
+    </p>
+    <p>
+      Jedynym podmiotem zewnętrznym z którym aplikacja się komunikuje jest
+      <strong style="color:var(--txt)">Google LLC</strong> — poprzez oficjalne Google APIs,
+      na zasadach określonych przez
+      <a href="https://policies.google.com/privacy" target="_blank" style="color:var(--b)">Politykę Prywatności Google</a>.
+    </p>
+  </div>
+
+  <!-- 6. Prawa użytkownika -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-green">✅</div>
+      <h2>Twoje prawa</h2>
+    </div>
+    <p>W każdej chwili możesz:</p>
+    <ul>
+      <li>Cofnąć dostęp aplikacji do swojego Google Drive w ustawieniach konta Google: <a href="https://myaccount.google.com/permissions" target="_blank" style="color:var(--b)">myaccount.google.com/permissions</a></li>
+      <li>Wylogować się z aplikacji klikając swoje imię w prawym górnym rogu</li>
+      <li>Wyczyścić dane przeglądarki usuwając Local Storage dla tej strony</li>
+    </ul>
+    <p style="margin-top:.75rem">
+      Ponieważ aplikacja nie przechowuje żadnych danych na serwerach,
+      cofnięcie dostępu OAuth w ustawieniach Google jest wystarczające
+      do całkowitego usunięcia możliwości dostępu aplikacji do Twojego dysku.
+    </p>
+  </div>
+
+  <!-- 7. Kontakt -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-blue">✉️</div>
+      <h2>Kontakt</h2>
+    </div>
+    <p>Jeśli masz pytania dotyczące niniejszej polityki prywatności, skontaktuj się z właścicielem aplikacji:</p>
+    <div class="contact-card">
+      <span class="contact-icon">👤</span>
+      <div class="contact-text">
+        Właściciel aplikacji Drive FileSearch<br>
+        GitHub: <a href="https://github.com/minkek" target="_blank">github.com/minkek</a>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<footer>
+  <span class="footer-brand">Drive <span>FileSearch</span> · Polityka Prywatności</span>
+  <a class="footer-link" href="index.html">← Wróć do aplikacji</a>
+</footer>
+
+</body>
+</html>

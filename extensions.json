@@ -1,0 +1,90 @@
+{
+  "Dokumenty": [
+    { "ext": "pdf",  "label": "PDF" },
+    { "ext": "doc",  "label": "Word (stary)" },
+    { "ext": "docx", "label": "Word" },
+    { "ext": "odt",  "label": "OpenDocument Text" },
+    { "ext": "rtf",  "label": "Rich Text Format" },
+    { "ext": "txt",  "label": "Tekst" },
+    { "ext": "md",   "label": "Markdown" }
+  ],
+  "Arkusze": [
+    { "ext": "xls",  "label": "Excel (stary)" },
+    { "ext": "xlsx", "label": "Excel" },
+    { "ext": "ods",  "label": "OpenDocument Arkusz" },
+    { "ext": "csv",  "label": "CSV" },
+    { "ext": "tsv",  "label": "TSV" }
+  ],
+  "Prezentacje": [
+    { "ext": "ppt",  "label": "PowerPoint (stary)" },
+    { "ext": "pptx", "label": "PowerPoint" },
+    { "ext": "odp",  "label": "OpenDocument Prezentacja" }
+  ],
+  "Obrazy": [
+    { "ext": "jpg",  "label": "JPEG" },
+    { "ext": "jpeg", "label": "JPEG (jpeg)" },
+    { "ext": "png",  "label": "PNG" },
+    { "ext": "gif",  "label": "GIF" },
+    { "ext": "webp", "label": "WebP" },
+    { "ext": "svg",  "label": "SVG" },
+    { "ext": "bmp",  "label": "BMP" },
+    { "ext": "tiff", "label": "TIFF" },
+    { "ext": "ico",  "label": "ICO" },
+    { "ext": "heic", "label": "HEIC" },
+    { "ext": "raw",  "label": "RAW" }
+  ],
+  "Wideo": [
+    { "ext": "mp4",  "label": "MP4" },
+    { "ext": "mov",  "label": "MOV" },
+    { "ext": "avi",  "label": "AVI" },
+    { "ext": "mkv",  "label": "MKV" },
+    { "ext": "webm", "label": "WebM" },
+    { "ext": "flv",  "label": "FLV" },
+    { "ext": "wmv",  "label": "WMV" },
+    { "ext": "m4v",  "label": "M4V" }
+  ],
+  "Audio": [
+    { "ext": "mp3",  "label": "MP3" },
+    { "ext": "wav",  "label": "WAV" },
+    { "ext": "flac", "label": "FLAC" },
+    { "ext": "aac",  "label": "AAC" },
+    { "ext": "ogg",  "label": "OGG" },
+    { "ext": "m4a",  "label": "M4A" },
+    { "ext": "wma",  "label": "WMA" }
+  ],
+  "Archiwa": [
+    { "ext": "zip",  "label": "ZIP" },
+    { "ext": "rar",  "label": "RAR" },
+    { "ext": "7z",   "label": "7-Zip" },
+    { "ext": "tar",  "label": "TAR" },
+    { "ext": "gz",   "label": "GZ" },
+    { "ext": "bz2",  "label": "BZ2" }
+  ],
+  "Kod i dane": [
+    { "ext": "js",   "label": "JavaScript" },
+    { "ext": "ts",   "label": "TypeScript" },
+    { "ext": "py",   "label": "Python" },
+    { "ext": "html", "label": "HTML" },
+    { "ext": "css",  "label": "CSS" },
+    { "ext": "json", "label": "JSON" },
+    { "ext": "xml",  "label": "XML" },
+    { "ext": "sql",  "label": "SQL" },
+    { "ext": "sh",   "label": "Shell" },
+    { "ext": "yaml", "label": "YAML" },
+    { "ext": "php",  "label": "PHP" },
+    { "ext": "java", "label": "Java" },
+    { "ext": "cpp",  "label": "C++" },
+    { "ext": "cs",   "label": "C#" }
+  ],
+  "Inne": [
+    { "ext": "epub", "label": "ePub" },
+    { "ext": "apk",  "label": "APK" },
+    { "ext": "exe",  "label": "EXE" },
+    { "ext": "dmg",  "label": "DMG" },
+    { "ext": "iso",  "label": "ISO" },
+    { "ext": "psd",  "label": "Photoshop" },
+    { "ext": "ai",   "label": "Illustrator" },
+    { "ext": "fig",  "label": "Figma" },
+    { "ext": "sketch","label": "Sketch" }
+  ]
+}

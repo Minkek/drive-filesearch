@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Drive FileSearch</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles/main.css?v=4"/>
+
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-icon">🔍</div>
+    <div>
+      <div class="brand-name">Drive <em>FileSearch</em></div>
+      <div class="brand-tag">google drive · wyszukiwarka plików</div>
+    </div>
+  </div>
+  <div id="user-area" style="display:none">
+    <div class="user-pill" onclick="signOut()" title="Kliknij, aby się wylogować">
+      <div class="user-avatar" id="user-avatar">?</div>
+      <span id="user-name" style="color:var(--txt2)">Wyloguj</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ LOGIN ═══════════════ -->
+<div id="login-screen">
+  <div class="login-hero">🔍</div>
+  <h1 class="login-title">Drive <span>FileSearch</span></h1>
+  <p class="login-sub">
+    Wyszukuj pliki na swoim Google Drive po rozszerzeniu.<br>
+    Twoje dane zostają w Twojej przeglądarce — nikt inny nie ma do nich dostępu.
+  </p>
+
+  <div class="login-feats">
+    <div class="feat"><span class="feat-ic">📁</span>Konkretny folder</div>
+    <div class="feat"><span class="feat-ic">🌐</span>Cały dysk Google</div>
+    <div class="feat"><span class="feat-ic">⚡</span>Duże zbiory plików</div>
+    <div class="feat"><span class="feat-ic">📊</span>Eksport do Sheets</div>
+    <div class="feat"><span class="feat-ic">🔒</span>Tylko odczyt Drive</div>
+    <div class="feat"><span class="feat-ic">👤</span>Twój dysk, Twoje pliki</div>
+  </div>
+
+  <div class="login-btn-wrap">
+    <button id="g-signin-btn" onclick="triggerOAuth()" style="
+      display:flex;align-items:center;gap:.85rem;
+      background:#fff;color:#1f1f1f;border:none;border-radius:999px;
+      padding:.75rem 1.75rem;font-size:.95rem;font-weight:600;
+      cursor:pointer;font-family:var(--sans);box-shadow:0 2px 12px rgba(0,0,0,.3);
+      transition:box-shadow .2s;
+    " onmouseover="this.style.boxShadow='0 4px 20px rgba(0,0,0,.4)'"
+       onmouseout="this.style.boxShadow='0 2px 12px rgba(0,0,0,.3)'">
+      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Zaloguj się przez Google
+    </button>
+    <p class="privacy-note">
+      Aplikacja żąda wyłącznie uprawnień <strong>drive.readonly</strong>.<br>
+      Nie zapisuje, nie modyfikuje ani nie wysyła Twoich plików.
+    </p>
+  </div>
+
+  <!-- Pojawia się tylko gdy właściciel nie wpisał Client ID -->
+  <div class="no-config" id="no-config">
+    <strong>⚙️ Konfiguracja wymagana (tylko dla właściciela aplikacji)</strong>
+    Aby aplikacja działała, otwórz plik <code>index.html</code> w edytorze
+    i zamień w linii&nbsp;3 wartość:<br><br>
+    <code>CLIENT_ID: '574487464726-5versj5g8uubppk4ikh4be92oa8b5r4l.apps.googleusercontent.com'</code><br><br>
+    na swój Client ID z Google Cloud Console, a następnie wgraj plik na serwer.<br>
+    Instrukcja: <a href="https://console.cloud.google.com/" target="_blank" style="color:var(--b)">console.cloud.google.com</a>
+    → APIs &amp; Services → Credentials → OAuth 2.0 Client ID
+  </div>
+</div>
+
+<!-- ═══════════════ APP ═══════════════ -->
+<div id="app" style="display:none;width:100%;max-width:940px">
+
+  <div class="card">
+    <div class="card-title">Konfiguracja wyszukiwania</div>
+
+    <div class="mode-tabs">
+      <div class="mode-tab active" id="tab-f" onclick="setMode('folder')">
+        <span class="tab-icon">📁</span>
+        <div><div class="tab-title">Konkretny folder</div><div class="tab-desc">podaj ID lub URL</div></div>
+      </div>
+      <div class="mode-tab dtab" id="tab-d" onclick="setMode('drive')">
+        <span class="tab-icon">🌐</span>
+        <div><div class="tab-title">Cały dysk Google</div><div class="tab-desc">przeszukaj wszystko</div></div>
+      </div>
+    </div>
+
+    <div class="warn-banner" id="warn">
+      ⚡ <strong>Tryb: Cały dysk</strong> — dla dużych dysków może to potrwać kilka minut. Wyniki pojawiają się na bieżąco.
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label class="fl">ID lub URL folderu</label>
+        <input type="text" id="folder-id" placeholder="1BxiMVs0XRA5nFMdKvBdBZjg…"/>
+        <p class="hint">Wklej URL lub ID z paska adresu Drive</p>
+      </div>
+      <div class="field">
+        <label class="fl">Rozszerzenia plików</label>
+        <div class="ext-picker-wrap">
+          <div class="ext-picker-trigger" id="ext-trigger" onclick="togglePicker()">
+            <span id="ext-trigger-label">Wybierz rozszerzenia…</span>
+            <span class="ext-trigger-arrow">▾</span>
+          </div>
+          <div class="ext-picker-dropdown" id="ext-dropdown" style="display:none">
+            <div class="ext-search-wrap">
+              <input type="text" id="ext-search" placeholder="Szukaj rozszerzenia…" oninput="filterExtensions()" autocomplete="off"/>
+            </div>
+            <div class="ext-custom-wrap">
+              <div class="ext-custom-header" id="ext-custom-header" onclick="toggleCustom()">
+                <span class="ext-custom-label">+ Dodaj własne rozszerzenie</span>
+                <span class="ext-custom-arrow" id="ext-custom-arrow">▾</span>
+              </div>
+              <div class="ext-custom-body" id="ext-custom-body" style="display:none">
+                <div class="ext-custom-row">
+                  <input type="text" id="ext-custom-input"
+                    placeholder="np. ai, fig, blend…"
+                    autocomplete="off"
+                    oninput="this.value=this.value.replace(/[^a-zA-Z0-9]/g,'')"
+                    onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomExt()}"/>
+                  <button type="button" class="ext-custom-btn" onclick="addCustomExt()">Dodaj</button>
+                </div>
+                <div class="ext-custom-tags" id="ext-custom-tags"></div>
+              </div>
+            </div>
+            <div class="ext-actions">
+              <button type="button" onclick="selectAll()">Zaznacz wszystkie</button>
+              <button type="button" onclick="clearAll()">Odznacz wszystkie</button>
+            </div>
+            <div class="ext-list" id="ext-list">
+              <div style="padding:1rem;text-align:center;color:var(--txt3);font-family:var(--mono);font-size:.78rem">Ładowanie…</div>
+            </div>
+          </div>
+        </div>
+        <p class="hint">Możesz zaznaczyć wiele rozszerzeń jednocześnie</p>
+        <div class="ext-tags" id="ext-tags"></div>
+      </div>
+    </div>
+
+    <div class="toggle-row" id="rec-row">
+      <label class="toggle"><input type="checkbox" id="recursive" checked/><span class="slider"></span></label>
+      <span class="toggle-label">Przeszukuj podfoldery rekurencyjnie</span>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-go" id="btn-go" onclick="startSearch()">▶ Szukaj</button>
+      <button class="btn-stop" id="btn-stop" onclick="stopSearch()" disabled>✕ Zatrzymaj</button>
+    </div>
+    <div class="err" id="err-box"></div>
+  </div>
+
+  <div class="card" id="prog-card">
+    <div class="prog-head">
+      <span class="prog-label" id="prog-label">Wyszukiwanie…</span>
+      <span class="prog-status" id="prog-status">inicjalizacja</span>
+    </div>
+    <div class="pbar-wrap"><div class="pbar" id="pbar"></div></div>
+    <div class="stats-row">
+      <div><span class="sv" id="sv-found">0</span>znaleziono</div>
+      <div><span class="sv" id="sv-req">0</span>zapytań API</div>
+      <div><span class="sv" id="sv-time">0s</span>czas</div>
+    </div>
+  </div>
+
+  <div class="card" id="res-card">
+    <div class="res-head">
+      <div class="res-left">
+        <span class="res-title">Wyniki</span>
+        <span class="badge" id="res-badge">0</span>
+        <span class="mpill" id="res-pill">tryb</span>
+      </div>
+      <button class="btn-export btn-sm" id="btn-export" onclick="exportSheet()" disabled>📊 Eksportuj do Sheets</button>
+    </div>
+    <div class="fbar">
+      <input type="text" id="f-name" placeholder="Filtruj po nazwie…" oninput="render()"/>
+      <select id="f-ext" onchange="render()"><option value="">Wszystkie typy</option></select>
+      <select id="s-col" onchange="render()">
+        <option value="name">Sortuj: nazwa</option>
+        <option value="ext">Sortuj: typ</option>
+        <option value="size">Sortuj: rozmiar</option>
+        <option value="modified">Sortuj: data</option>
+        <option value="path">Sortuj: lokalizacja</option>
+      </select>
+      <select id="s-dir" onchange="render()">
+        <option value="asc">Rosnąco</option>
+        <option value="desc">Malejąco</option>
+      </select>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th onclick="sortBy('name')">Nazwa</th>
+          <th onclick="sortBy('ext')">Typ</th>
+          <th onclick="sortBy('size')">Rozmiar</th>
+          <th onclick="sortBy('path')" id="th-path">Lokalizacja</th>
+          <th onclick="sortBy('modified')">Modyfikacja</th>
+          <th>Otwórz</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="empty" id="empty" style="display:none"><span>🗂️</span>Brak wyników spełniających kryteria</div>
+    <div class="paging" id="paging"></div>
+  </div>
+
+</div>
+
+<script>
+// ════════════════════════════════════════════════════
+//  ★ KONFIGURACJA – zmień tylko tę jedną linię ★
+// ════════════════════════════════════════════════════
+const CONFIG = {
+  CLIENT_ID:    '574487464726-5versj5g8uubppk4ikh4be92oa8b5r4l.apps.googleusercontent.com',
+  REDIRECT_URI: 'https://minkek.github.io/drive-filesearch/',
+};
+// ════════════════════════════════════════════════════
+
+const SCOPES   = 'openid profile email https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/spreadsheets';
+const API_BASE = 'https://www.googleapis.com/drive/v3';
+const PAGE_SZ  = 50;
+
+let token    = null;
+let allFiles = [];
+let mode     = 'folder';
+let running  = false;
+let reqCount = 0, t0 = 0;
+let timerInt = null;
+let curPage  = 1;
+
+// ════════════════════════════════════════════════════
+//  EXTENSION PICKER
+// ════════════════════════════════════════════════════
+let extData    = {};   // { Kategoria: [{ext, label}] }
+let checkedExt = new Set();
+
+async function loadExtensions() {
+  try {
+    const res = await fetch('extensions.json?v=' + Date.now());
+    extData = await res.json();
+  } catch(_) {
+    // Fallback jeśli plik nie istnieje
+    extData = {
+      'Dokumenty': [{ext:'pdf',label:'PDF'},{ext:'docx',label:'Word'},{ext:'doc',label:'Word (stary)'},{ext:'txt',label:'Tekst'},{ext:'odt',label:'ODT'}],
+      'Arkusze':   [{ext:'xlsx',label:'Excel'},{ext:'xls',label:'Excel (stary)'},{ext:'csv',label:'CSV'},{ext:'ods',label:'ODS'}],
+      'Prezentacje':[{ext:'pptx',label:'PowerPoint'},{ext:'ppt',label:'PPT (stary)'},{ext:'odp',label:'ODP'}],
+      'Obrazy':    [{ext:'jpg',label:'JPG'},{ext:'png',label:'PNG'},{ext:'gif',label:'GIF'},{ext:'webp',label:'WebP'},{ext:'svg',label:'SVG'},{ext:'heic',label:'HEIC'}],
+      'Wideo':     [{ext:'mp4',label:'MP4'},{ext:'mov',label:'MOV'},{ext:'avi',label:'AVI'},{ext:'mkv',label:'MKV'}],
+      'Audio':     [{ext:'mp3',label:'MP3'},{ext:'wav',label:'WAV'},{ext:'flac',label:'FLAC'},{ext:'aac',label:'AAC'}],
+      'Archiwa':   [{ext:'zip',label:'ZIP'},{ext:'rar',label:'RAR'},{ext:'7z',label:'7-Zip'},{ext:'tar',label:'TAR'}],
+    };
+  }
+  renderExtList('');
+}
+
+function renderExtList(query) {
+  const q = query.toLowerCase().trim();
+  const list = document.getElementById('ext-list');
+  let html = '';
+  let anyVisible = false;
+
+  for (const [cat, items] of Object.entries(extData)) {
+    const filtered = q
+      ? items.filter(i => i.ext.includes(q) || i.label.toLowerCase().includes(q))
+      : items;
+    if (filtered.length === 0) continue;
+    anyVisible = true;
+
+    html += `<div class="ext-category">
+      <div class="ext-cat-header">
+        <span>${cat}</span>
+        <button onclick="toggleCategory('${cat}')">zaznacz wszystkie</button>
+      </div>
+      <div class="ext-items">`;
+    for (const item of filtered) {
+      const checked = checkedExt.has(item.ext);
+      html += `<label class="ext-chip ${checked ? 'checked' : ''}" id="chip-${item.ext}">
+        <input type="checkbox" value="${item.ext}" ${checked ? 'checked' : ''}
+          onchange="toggleExt('${item.ext}', this.checked)"/>
+        <span class="ext-chip-label">.${item.ext}</span>
+      </label>`;
+    }
+    html += `</div></div>`;
+  }
+
+  if (!anyVisible) html = `<div class="ext-no-results">Brak wyników dla „${query}"</div>`;
+  list.innerHTML = html;
+}
+
+function toggleExt(ext, checked) {
+  if (checked) checkedExt.add(ext);
+  else checkedExt.delete(ext);
+  // Aktualizuj wygląd chipa
+  const chip = document.getElementById('chip-' + ext);
+  if (chip) chip.classList.toggle('checked', checked);
+  updateTriggerLabel();
+}
+
+function toggleCategory(cat) {
+  const items = extData[cat] || [];
+  const allChecked = items.every(i => checkedExt.has(i.ext));
+  items.forEach(i => {
+    if (allChecked) checkedExt.delete(i.ext);
+    else checkedExt.add(i.ext);
+    const chip = document.getElementById('chip-' + i.ext);
+    if (chip) {
+      chip.classList.toggle('checked', !allChecked);
+      const cb = chip.querySelector('input');
+      if (cb) cb.checked = !allChecked;
+    }
+  });
+  updateTriggerLabel();
+}
+
+function selectAll() {
+  for (const items of Object.values(extData)) items.forEach(i => checkedExt.add(i.ext));
+  renderExtList(document.getElementById('ext-search').value);
+  updateTriggerLabel();
+}
+
+function clearAll() {
+  checkedExt.clear();
+  renderExtList(document.getElementById('ext-search').value);
+  updateTriggerLabel();
+}
+
+function filterExtensions() {
+  renderExtList(document.getElementById('ext-search').value);
+}
+
+function updateTriggerLabel() {
+  const label = document.getElementById('ext-trigger-label');
+  const tags  = document.getElementById('ext-tags');
+  if (checkedExt.size === 0) {
+    label.textContent = 'Wybierz rozszerzenia…';
+    label.classList.remove('has-selection');
+    tags.innerHTML = '';
+  } else {
+    label.textContent = checkedExt.size + ' rozszerzeń wybranych';
+    label.classList.add('has-selection');
+    tags.innerHTML = [...checkedExt].sort().map(ext =>
+      `<span class="ext-tag">.${ext}<span class="ext-tag-x" onclick="toggleExt('${ext}',false);document.getElementById('cb-${ext}') && (document.getElementById('cb-${ext}').checked=false)">✕</span></span>`
+    ).join('');
+  }
+}
+
+function togglePicker() {
+  const dd = document.getElementById('ext-dropdown');
+  const tr = document.getElementById('ext-trigger');
+  const open = dd.style.display === 'none';
+  dd.style.display = open ? 'block' : 'none';
+  tr.classList.toggle('open', open);
+  if (open) {
+    document.getElementById('ext-search').focus();
+    // Zamknij przy kliknięciu poza dropdownem
+    setTimeout(() => {
+      document.addEventListener('click', closePicker);
+    }, 10);
+  }
+}
+
+function closePicker(e) {
+  const wrap = document.querySelector('.ext-picker-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('ext-dropdown').style.display = 'none';
+    document.getElementById('ext-trigger').classList.remove('open');
+    document.removeEventListener('click', closePicker);
+  }
+}
+
+let customExts = new Set(); // Własne rozszerzenia użytkownika
+
+function toggleCustom() {
+  const body  = document.getElementById('ext-custom-body');
+  const arrow = document.getElementById('ext-custom-arrow');
+  const open  = body.style.display === 'none';
+  body.style.display = open ? 'block' : 'none';
+  arrow.classList.toggle('open', open);
+  if (open) {
+    setTimeout(() => document.getElementById('ext-custom-input').focus(), 50);
+  }
+}
+
+function addCustomExt() {
+  const input = document.getElementById('ext-custom-input');
+  const val   = input.value.trim().toLowerCase().replace(/^\./, '');
+
+  if (!val) return;
+
+  // Walidacja – tylko litery i cyfry, max 10 znaków
+  if (!/^[a-z0-9]{1,10}$/.test(val)) {
+    showCustomErr('Tylko litery i cyfry, maks. 10 znaków');
+    return;
+  }
+
+  // Już istnieje w wbudowanych?
+  const builtIn = Object.values(extData).flat().find(i => i.ext === val);
+  if (builtIn) {
+    // Zaznacz zamiast dodawać osobno
+    checkedExt.add(val);
+    renderExtList(document.getElementById('ext-search').value);
+    updateTriggerLabel();
+    input.value = '';
+    return;
+  }
+
+  // Już dodane
+  if (customExts.has(val)) {
+    checkedExt.add(val);
+    updateTriggerLabel();
+    renderCustomTags();
+    input.value = '';
+    return;
+  }
+
+  customExts.add(val);
+  checkedExt.add(val);
+  input.value = '';
+  hideCustomErr();
+  renderCustomTags();
+  updateTriggerLabel();
+}
+
+function removeCustomExt(ext) {
+  customExts.delete(ext);
+  checkedExt.delete(ext);
+  renderCustomTags();
+  updateTriggerLabel();
+}
+
+function renderCustomTags() {
+  const wrap = document.getElementById('ext-custom-tags');
+  if (customExts.size === 0) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = [...customExts].map(ext => `
+    <span class="ext-custom-tag">
+      .${ext}
+      <span class="ext-custom-tag-x" onclick="removeCustomExt('${ext}')">✕</span>
+    </span>`).join('');
+}
+
+function showCustomErr(msg) {
+  let el = document.getElementById('ext-custom-err');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'ext-custom-err';
+    el.className = 'ext-custom-err';
+    document.getElementById('ext-custom-tags').after(el);
+  }
+  el.textContent = '⚠ ' + msg;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 2500);
+}
+
+function hideCustomErr() {
+  const el = document.getElementById('ext-custom-err');
+  if (el) el.style.display = 'none';
+}
+
+function getSelectedExtensions() {
+  return [...checkedExt, ...customExts].filter((v, i, a) => a.indexOf(v) === i);
+}
+
+// ── INIT ─────────────────────────────────────────────
+// Krok 1: Odczytaj token z URL natychmiast przy ładowaniu strony
+(function checkTokenImmediately() {
+  // Sprawdź hash w URL (#access_token=...)
+  const hash = location.hash || window.location.hash;
+  if (hash && hash.includes('access_token')) {
+    try {
+      const p = new URLSearchParams(hash.replace(/^#/, ''));
+      const t = p.get('access_token');
+      const exp = p.get('expires_in');
+      if (t) {
+        const expiresAt = Date.now() + (parseInt(exp) || 3600) * 1000;
+        localStorage.setItem('dsf_token', t);
+        localStorage.setItem('dsf_token_exp', String(expiresAt));
+        // Usuń hash z URL
+        history.replaceState(null, '', location.pathname + location.search);
+      }
+    } catch(e) {}
+  }
+})();
+
+window.addEventListener('DOMContentLoaded', () => {
+  const cid = CONFIG.CLIENT_ID;
+
+  // Brak Client ID – pokaż instrukcję
+  if (!cid || cid.includes('WPISZ')) {
+    document.getElementById('no-config').style.display = 'block';
+    document.getElementById('g-signin-btn').style.display = 'none';
+    return;
+  }
+
+  // Sprawdź czy token istnieje i nie wygasł
+  const saved    = localStorage.getItem('dsf_token');
+  const savedExp = parseInt(localStorage.getItem('dsf_token_exp') || '0');
+  const valid    = saved && savedExp && Date.now() < savedExp;
+
+  if (valid) {
+    token = saved;
+    showApp();
+    return;
+  }
+
+  // Wyczyść wygasły token
+  localStorage.removeItem('dsf_token');
+  localStorage.removeItem('dsf_token_exp');
+
+  // Pokaż przycisk logowania
+  document.getElementById('g-signin-btn').style.display = 'flex';
+});
+
+function triggerOAuth() {
+  const params = new URLSearchParams({
+    client_id:     CONFIG.CLIENT_ID,
+    redirect_uri:  CONFIG.REDIRECT_URI,
+    response_type: 'token',
+    scope:         SCOPES,
+    prompt:        'select_account',
+  });
+  location.href = 'https://accounts.google.com/o/oauth2/v2/auth?' + params;
+}
+
+async function showApp() {
+  try {
+    const u = await apiFetch('https://www.googleapis.com/oauth2/v3/userinfo');
+    document.getElementById('user-name').textContent = u.name || u.email || 'Wyloguj';
+    const av = document.getElementById('user-avatar');
+    if (u.picture) av.innerHTML = `<img src="${u.picture}" referrerpolicy="no-referrer"/>`;
+    else av.textContent = (u.name || 'U')[0].toUpperCase();
+    document.getElementById('user-area').style.display = 'flex';
+  } catch(_) {}
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  loadExtensions();
+}
+
+function signOut() {
+  token = null;
+  localStorage.removeItem('dsf_token');
+  localStorage.removeItem('dsf_token_exp');
+  location.reload();
+}
+
+// ── TRYB ─────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  document.getElementById('tab-f').classList.toggle('active', m === 'folder');
+  document.getElementById('tab-d').classList.toggle('active', m === 'drive');
+  document.getElementById('folder-id').disabled = m === 'drive';
+  document.getElementById('rec-row').classList.toggle('off', m === 'drive');
+  document.getElementById('warn').classList.toggle('show', m === 'drive');
+  const btn = document.getElementById('btn-go');
+  btn.textContent = m === 'drive' ? '🌐 Szukaj na całym dysku' : '▶ Szukaj';
+  btn.className   = m === 'drive' ? 'btn-go drive' : 'btn-go';
+}
+
+// ── WYSZUKIWANIE ──────────────────────────────────────
+async function startSearch() {
+  hideErr();
+  const extList = getSelectedExtensions();
+  if (extList.length === 0) { showErr('Wybierz przynajmniej jedno rozszerzenie.'); return; }
+
+  let folderId = '';
+  if (mode === 'folder') {
+    const raw = document.getElementById('folder-id').value.trim();
+    if (!raw) { showErr('Podaj ID lub URL folderu.'); return; }
+    folderId = extractId(raw);
+  }
+  const recursive = document.getElementById('recursive').checked;
+
+  allFiles = []; reqCount = 0; curPage = 1; running = true; t0 = Date.now();
+  document.getElementById('prog-card').style.display = 'block';
+  document.getElementById('res-card').style.display  = 'none';
+  document.getElementById('btn-go').disabled   = true;
+  document.getElementById('btn-stop').disabled = false;
+  document.getElementById('pbar').className    = 'pbar' + (mode === 'drive' ? ' drive' : '');
+  document.getElementById('pbar').style.width  = '0%';
+  document.getElementById('prog-label').textContent = mode === 'drive' ? 'Skanowanie całego dysku…' : 'Wyszukiwanie…';
+  document.getElementById('f-ext').innerHTML   = '<option value="">Wszystkie typy</option>';
+  timerInt = setInterval(() => { document.getElementById('sv-time').textContent = Math.floor((Date.now() - t0) / 1000) + 's'; }, 500);
+
+  try {
+    if (mode === 'drive') await searchDrive(extList);
+    else await searchFolder(folderId, extList, recursive, '');
+  } catch(e) {
+    if (running) showErr('Błąd API: ' + e.message);
+  }
+  finishSearch();
+}
+
+async function searchDrive(extList) {
+  const q = `(${extList.map(e => `name contains '.${e}'`).join(' or ')}) and trashed = false`;
+  let pageToken = null;
+  do {
+    if (!running) break;
+    const params = { q, fields: 'nextPageToken,files(id,name,size,modifiedTime,webViewLink,parents)', pageSize: 1000 };
+    if (pageToken) params.pageToken = pageToken;
+    const res = await driveList(params);
+    for (const f of res.files || []) {
+      if (!running) break;
+      if (!extList.includes(getExt(f.name))) continue;
+      let parent = 'Mój Dysk';
+      if (f.parents?.[0]) try { parent = await getFileName(f.parents[0]); } catch(_) {}
+      allFiles.push(makeItem(f, parent));
+      updateStats();
+    }
+    pageToken = res.nextPageToken;
+  } while (pageToken && running);
+}
+
+async function searchFolder(folderId, extList, recursive, pathPrefix) {
+  if (!running) return;
+  let folderName = pathPrefix || (await getFileName(folderId).catch(() => folderId));
+  const q = `(${extList.map(e => `name contains '.${e}'`).join(' or ')}) and '${folderId}' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'`;
+  let pageToken = null;
+  do {
+    if (!running) break;
+    const params = { q, fields: 'nextPageToken,files(id,name,size,modifiedTime,webViewLink)', pageSize: 1000 };
+    if (pageToken) params.pageToken = pageToken;
+    const res = await driveList(params);
+    for (const f of res.files || []) {
+      if (!extList.includes(getExt(f.name))) continue;
+      allFiles.push(makeItem(f, folderName));
+      updateStats();
+    }
+    pageToken = res.nextPageToken;
+  } while (pageToken && running);
+
+  if (recursive && running) {
+    const sq = `'${folderId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
+    let st = null;
+    do {
+      if (!running) break;
+      const p = { q: sq, fields: 'nextPageToken,files(id,name)', pageSize: 1000 };
+      if (st) p.pageToken = st;
+      const res = await driveList(p);
+      for (const sub of res.files || []) {
+        if (!running) break;
+        await searchFolder(sub.id, extList, true, folderName + '/' + sub.name);
+      }
+      st = res.nextPageToken;
+    } while (st && running);
+  }
+}
+
+function finishSearch() {
+  running = false;
+  clearInterval(timerInt);
+  document.getElementById('btn-go').disabled   = false;
+  document.getElementById('btn-stop').disabled = true;
+  document.getElementById('pbar').style.width  = '100%';
+  setStatus(`zakończono ✓ — ${allFiles.length} plików`);
+  document.getElementById('res-card').style.display  = 'block';
+  document.getElementById('res-badge').textContent   = allFiles.length;
+  document.getElementById('res-pill').textContent    = mode === 'drive' ? '🌐 cały dysk' : '📁 folder';
+  document.getElementById('res-pill').className      = mode === 'drive' ? 'mpill' : 'mpill f';
+  document.getElementById('th-path').textContent     = mode === 'drive' ? 'Folder nadrzędny' : 'Ścieżka';
+  document.getElementById('btn-export').disabled     = allFiles.length === 0;
+  if (allFiles.length === 0) {
+    document.getElementById('tbody').innerHTML = '';
+    document.getElementById('empty').style.display = 'block';
+  } else { render(); }
+}
+
+function stopSearch() { running = false; setStatus('zatrzymano'); }
+
+// ── API ───────────────────────────────────────────────
+async function apiFetch(url, opts = {}) {
+  const res = await fetch(url, { ...opts, headers: { Authorization: 'Bearer ' + token, ...(opts.headers || {}) } });
+  if (res.status === 401) {
+    // Token wygasł – wyczyść i wróć do logowania tylko jeśli to nie userinfo
+    if (!url.includes('userinfo')) {
+      signOut();
+    }
+    throw new Error('Sesja wygasła.');
+  }
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+async function driveList(params) {
+  reqCount++;
+  document.getElementById('sv-req').textContent = reqCount;
+  return apiFetch(`${API_BASE}/files?` + new URLSearchParams(params));
+}
+
+const nameCache = {};
+async function getFileName(id) {
+  if (nameCache[id]) return nameCache[id];
+  const r = await apiFetch(`${API_BASE}/files/${id}?fields=name`);
+  return (nameCache[id] = r.name);
+}
+
+function makeItem(f, path) {
+  return { id: f.id, name: f.name,
+    url:      f.webViewLink || `https://drive.google.com/file/d/${f.id}/view`,
+    size:     fmtBytes(parseInt(f.size) || 0),
+    rawSize:  parseInt(f.size) || 0,
+    modified: (f.modifiedTime || '').slice(0, 16).replace('T', ' '),
+    path };
+}
+
+function fmtBytes(b) {
+  if (!b) return '0 B';
+  const u = ['B','KB','MB','GB'], i = Math.floor(Math.log(b) / Math.log(1024));
+  return (b / Math.pow(1024, i)).toFixed(1) + ' ' + u[Math.min(i, 3)];
+}
+
+function updateStats() {
+  document.getElementById('sv-found').textContent = allFiles.length;
+  document.getElementById('pbar').style.width = Math.min(88, 8 + allFiles.length / 8) + '%';
+}
+
+function setStatus(m) { document.getElementById('prog-status').textContent = m; }
+
+// ── TABELA ────────────────────────────────────────────
+function render() {
+  const nf = document.getElementById('f-name').value.toLowerCase();
+  const ef = document.getElementById('f-ext').value.toLowerCase();
+  const sc = document.getElementById('s-col').value;
+  const sd = document.getElementById('s-dir').value;
+
+  let data = allFiles.filter(f => {
+    const ext = getExt(f.name);
+    return (!nf || f.name.toLowerCase().includes(nf)) && (!ef || ext === ef);
+  });
+
+  data.sort((a, b) => {
+    let va, vb;
+    if (sc === 'ext')       { va = getExt(a.name); vb = getExt(b.name); }
+    else if (sc === 'size') { va = a.rawSize;       vb = b.rawSize; }
+    else                    { va = (a[sc]||'').toLowerCase(); vb = (b[sc]||'').toLowerCase(); }
+    return sd === 'asc' ? (va < vb ? -1 : va > vb ? 1 : 0) : (va > vb ? -1 : va < vb ? 1 : 0);
+  });
+
+  // Aktualizuj dropdown rozszerzeń
+  const sel = document.getElementById('f-ext');
+  const ex  = new Set([...sel.options].map(o => o.value));
+  [...new Set(allFiles.map(f => getExt(f.name)))].sort().forEach(e => {
+    if (e && !ex.has(e)) { const o = document.createElement('option'); o.value = e; o.textContent = '.' + e.toUpperCase(); sel.appendChild(o); }
+  });
+
+  const total = data.length;
+  const pages = Math.max(1, Math.ceil(total / PAGE_SZ));
+  curPage = Math.min(curPage, pages);
+  const pg = data.slice((curPage - 1) * PAGE_SZ, curPage * PAGE_SZ);
+
+  const tbody = document.getElementById('tbody');
+  document.getElementById('empty').style.display = pg.length === 0 ? 'block' : 'none';
+  tbody.innerHTML = pg.length === 0 ? '' : pg.map(f => `
+    <tr>
+      <td><span class="fname" title="${e(f.name)}">${e(f.name)}</span></td>
+      <td><span class="ext-pill">${e(getExt(f.name)) || '—'}</span></td>
+      <td style="font-family:var(--mono);white-space:nowrap">${e(f.size)}</td>
+      <td><span class="fpath" title="${e(f.path)}">${e(f.path)}</span></td>
+      <td style="font-family:var(--mono);font-size:.7rem;white-space:nowrap">${e(f.modified)}</td>
+      <td><a class="olink" href="${e(f.url)}" target="_blank">↗ otwórz</a></td>
+    </tr>`).join('');
+
+  renderPaging(pages, total);
+}
+
+function renderPaging(pages, total) {
+  const wrap = document.getElementById('paging');
+  if (pages <= 1) { wrap.innerHTML = ''; return; }
+  let h = `<span style="font-family:var(--mono);font-size:.7rem;color:var(--txt2);margin-right:.4rem">${total} wyników · ${curPage}/${pages}</span>`;
+  if (curPage > 1) h += `<button class="pg" onclick="goP(${curPage-1})">‹</button>`;
+  vpages(curPage, pages).forEach(p => {
+    if (p === '…') h += `<span style="padding:.35rem .3rem;color:var(--txt3)">…</span>`;
+    else h += `<button class="pg ${p===curPage?'on':''}" onclick="goP(${p})">${p}</button>`;
+  });
+  if (curPage < pages) h += `<button class="pg" onclick="goP(${curPage+1})">›</button>`;
+  wrap.innerHTML = h;
+}
+
+function vpages(c, t) {
+  if (t <= 7) return Array.from({length:t},(_,i)=>i+1);
+  const p=[1]; if(c>3) p.push('…');
+  for(let i=Math.max(2,c-1);i<=Math.min(t-1,c+1);i++) p.push(i);
+  if(c<t-2) p.push('…'); p.push(t); return p;
+}
+
+function goP(p) { curPage = p; render(); window.scrollTo(0,0); }
+function sortBy(col) {
+  const sc = document.getElementById('s-col'), sd = document.getElementById('s-dir');
+  if (sc.value === col) sd.value = sd.value === 'asc' ? 'desc' : 'asc';
+  else { sc.value = col; sd.value = 'asc'; }
+  curPage = 1; render();
+}
+
+// ── EKSPORT ───────────────────────────────────────────
+async function exportSheet() {
+  const btn = document.getElementById('btn-export');
+  btn.disabled = true; btn.textContent = '⏳ Tworzę arkusz…';
+  try {
+    const title  = 'Wyniki wyszukiwania – ' + new Date().toLocaleString('pl');
+    const sheet  = await apiFetch('https://sheets.googleapis.com/v4/spreadsheets', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ properties: { title } })
+    });
+    const sid  = sheet.spreadsheetId;
+    const rows = [['Nazwa pliku','Rozszerzenie','Rozmiar','Lokalizacja','Data modyfikacji','Link'],
+                  ...allFiles.map(f => [f.name, getExt(f.name).toUpperCase(), f.size, f.path, f.modified, f.url])];
+    await apiFetch(`https://sheets.googleapis.com/v4/spreadsheets/${sid}/values/A1:append?valueInputOption=USER_ENTERED`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ values: rows })
+    });
+
+    const sheetUrl = `https://docs.google.com/spreadsheets/d/${sid}`;
+
+    // Pokaż link zamiast otwierać popup – działa zawsze
+    btn.disabled = false;
+    btn.textContent = '✅ Arkusz gotowy – kliknij tutaj';
+    btn.onclick = () => { location.href = sheetUrl; };
+    btn.style.background = 'linear-gradient(135deg,#0f9d58,#1a73e8)';
+
+  } catch(err) {
+    showErr('Błąd eksportu: ' + err.message);
+    btn.disabled = false;
+    btn.textContent = '📊 Eksportuj do Sheets';
+    btn.onclick = exportSheet;
+  }
+}
+
+// ── HELPERS ───────────────────────────────────────────
+function extractId(s) { const m = s.match(/[-\w]{25,}/); return m ? m[0] : s; }
+function getExt(n)     { const p = n.split('.'); return p.length > 1 ? p[p.length-1].toLowerCase() : ''; }
+function e(s)          { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showErr(m)    { const b = document.getElementById('err-box'); b.textContent = '⚠ ' + m; b.style.display = 'block'; }
+function hideErr()     { document.getElementById('err-box').style.display = 'none'; }
+</script>
+
+<footer>
+  <span class="footer-brand">Drive <span>FileSearch</span> · &copy; 2025</span>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a class="footer-link" href="privacy.html">🔒 Polityka prywatności</a>
+    <a class="footer-link" href="https://github.com/minkek/drive-filesearch" target="_blank">GitHub ↗</a>
+  </div>
+</footer>
+
+</body>
+</html>
